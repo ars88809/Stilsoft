@@ -1,0 +1,4 @@
+﻿  propis_final_da.cpp
+C:\Users\tak_b\OneDrive\Рабочий стол\c++\propis_final_da\propis_final_da\propis_final_da.cpp(88,27): warning C4244: инициализация: преобразование "__int64" в "int", возможна потеря данных
+C:\Users\tak_b\OneDrive\Рабочий стол\c++\propis_final_da\propis_final_da\propis_final_da.cpp(95,63): warning C4244: аргумент: преобразование "__int64" в "int", возможна потеря данных
+  propis_final_da.vcxproj -> C:\Users\tak_b\OneDrive\Рабочий стол\c++\propis_final_da\x64\Debug\propis_final_da.exe
