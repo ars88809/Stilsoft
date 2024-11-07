@@ -1,8 +1,8 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
-#include "const.h"
+#include <cmath>
 
 std::string unitsMale[] = { "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять" };
 std::string unitsFemale[] = { "", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять" };
@@ -78,7 +78,7 @@ std::string numberToWords(long long num)
 
     std::ostringstream result;
 
-    int parts[] = { billion, million, thousand, 1 };
+    int parts[] = { pow(10, 9), pow(10, 6), pow(10, 3) };
     std::string* wordForms[] = { billions, millions, thousands, nullptr };
 
     for (int i = 0; i < 3; ++i)
