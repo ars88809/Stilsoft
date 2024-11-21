@@ -13,6 +13,7 @@ std::string thousands[] = { "", "тысяча", "тысячи", "тысяч" };
 std::string millions[] = { "", "миллион", "миллиона", "миллионов" };
 std::string billions[] = { "", "миллиард", "миллиарда", "миллиардов" };
 int second_teens[] = { 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+int* st = second_teens;
 
 std::string getWordForm(int num, std::string forms[]);
 std::string numToWords(int num, bool isFemale = false);
@@ -35,7 +36,7 @@ std::string getWordForm(int num, std::string forms[])
     int lastTwoDigits = num % 100;
     int lastDigit = num % 10;
 
-    if (lastTwoDigits == *(second_teens + lastTwoDigits - 11))
+    if (lastTwoDigits == *(st + lastTwoDigits - 11))
     {
         return forms[3];
     }
