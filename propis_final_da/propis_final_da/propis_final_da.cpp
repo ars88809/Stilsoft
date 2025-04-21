@@ -1,118 +1,99 @@
 #include <iostream>
-#include <vector>
-#include <string>
-#include <map>
 #include <cmath>
-#include <algorithm>
+#include <string>
 
-struct NumberRule
-{
-    int base; // разряд числа 
-    int start; // начальная позиция для правила
-    int count; // количество элементов
-    bool female; // женский род
-    std::vector<std::string> forms; // база знаний
-};
+std::string units[] = {"", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"};
+std::string units_female[] = {"", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять" };
+std::string teens[] = {"десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать" };
+std::string tens[] = {"", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто" };
+std::string hundreds[] = {"", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот",  "семьсот", "восемьсот", "девятьсот" };
+std::string forms[] = {"", "тысяча", "тысячи", "тысяч", "миллион", "миллиона", "миллионов", "миллиард", "миллиарда", "миллиардов" };
 
-const std::vector<NumberRule> rules =
-{
-    {100, 1, 9, false, {"сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"}},
-    {10, 2, 8, false, {"двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"}},
-    {1, 10, 10, false, {"десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"}},
-    {1, 1, 2, true, {"одна", "две"}},
-    {1, 1, 9, false, {"один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"}},
-};
-
-const std::map<int, std::vector<std::string>> classes =
-{
-    {3, {"тысяча", "тысячи", "тысяч"}},
-    {6, {"миллион", "миллиона", "миллионов"}},
-    {9, {"миллиард", "миллиарда", "миллиардов"}}
-};
-
-std::string convert_part(int num, bool female); // функция которая преобразует числа до 1000
-std::string get_form(int num, int scale); // возвращает правильную форму слова
-std::string number_to_words(long long num); // преобразует и собирает слово
+std::string triplet(int num, bool female);
+std::string num_to_word(long long num);
+std::string getForm(int n, int num_seg);
 
 int main()
 {
     setlocale(LC_ALL, "");
-    long long num;
-    while (true)
+    long long n;
+    while (true) 
     {
         std::cout << "Введите число: ";
-        std::cin >> num;
-        std::cout << number_to_words(num) << std::endl;
+        std::cin >> n;
+        std::cout << num_to_word(n) << std::endl;
     }
     return 0;
 }
 
-std::string convert_part(int num, bool female) {
-    if (num == 0) return "";
+std::string triplet(int num, bool female) {
+    std::string result;
+    int h = num / 100;
+    int t = (num / 10) % 10;
+    int u = num % 10;
 
-    std::string res;
-    for (const auto& rule : rules) {
-        if (num < rule.start) continue;
-        if (rule.female && !female) continue; 
+    if (h > 0) {
+        result += hundreds[h] + " ";
+    }
 
-        int value = (num / rule.base) * rule.base;
-        if (value >= rule.start * rule.base) {
-            int index = (value / rule.base) - rule.start;
-            if (rule.base == 1 && female && index < 2 && rule.female) {
-                res += rule.forms[index] + " ";
-                num -= value;
-                break;
-            }
-            else if (index < static_cast<int>(rule.forms.size())) {
-                res += rule.forms[index] + " ";
-                num -= value;
-                if (rule.start == 10 && rule.base == 1) {
-                    num = 0;
+    if (t == 1) {
+        result += teens[u] + " ";
+    }
+    else {
+        if (t > 1) {
+            result += tens[t] + " ";
+        }
+        if (u > 0) {
+            result += (female ? units_female[u] : units[u]) + " ";
+        }
+    }
+
+    return result;
+}
+
+std::string getForm(int n, int num_seg)
+{
+    int seg = (num_seg - 1) * 3 + 1;
+    n %= 100;
+    if (n >= 11 && n <= 19)
+    {
+        return *(forms + seg + 2);
+    }
+    switch (n % 10) 
+    {
+    case 1: return *(forms + seg);
+    case 2:
+    case 3:
+    case 4: return *(forms + seg + 1);
+    default: return *(forms + seg + 2);
+    }
+}
+
+std::string num_to_word(long long num)
+{
+    std::string result;
+    int len = (log10(num) + 1);
+    int segments = (len + 2) / 3;
+    for (int seg = segments - 1; seg >= 0; seg--) {
+        long long power = pow(1000, seg);
+        int current_segment = (num / power) % 1000;
+        if (current_segment > 0) {
+            bool female = (seg == 1); 
+            result += triplet(current_segment, female);
+            if (seg > 0) {
+                std::string form = getForm(current_segment, seg);
+                if (!form.empty()) {
+                    result += form + " ";
                 }
             }
         }
+
     }
 
-    // Удаление лишнего пробела
-    if (!res.empty() && res.back() == ' ') res.pop_back();
-    return res;
-}
-std::string get_form(int num, int scale)
-{
-    auto i = classes.find(scale);
-    if (i == classes.end()) return "";
-
-    num = num % 100;
-    if (num > 19) num %= 10;
-    return i->second[num == 1 ? 0 : (num > 1 && num < 5) ? 1 : 2];
-}
-
-std::string number_to_words(long long num)
-{
-    if (num == 0) return "ноль";
-
-    std::string result;
-    for (auto i = classes.rbegin(); i != classes.rend(); ++i)
-    {
-        long long power = pow(10, i->first);
-        int part = (num / power) % 1000;
-
-        if (part > 0) {
-            std::string words = convert_part(part, i->first == 3);
-            result += words + " " + get_form(part, i->first) + " ";
-        }
-    }
-
-    int last_part = num % 1000;
-    if (last_part > 0) {
-        std::string words = convert_part(last_part, false);
-        if (!words.empty()) {
-            result += words;
-        }
-    }
-
-    while (!result.empty() && result.back() == ' ') {
+    // Удаляем лишний пробел в конце
+    if (!result.empty() && result.back() == ' ') {
         result.pop_back();
     }
-    return result.empty() ? "ноль" : result;
+
+    return result;
 }
