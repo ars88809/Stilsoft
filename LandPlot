@@ -1,0 +1,80 @@
+#include <iostream>
+#include <string>
+#include <cmath>
+
+class LandPlot
+{
+private:
+    std::string landType;
+    std::string OwnerName;
+    std::string LandForm;
+    double side1;
+    double side2;
+    double side3;
+
+public:
+    LandPlot(const std::string& type, const std::string& name, const std::string& form, double s1, double s2 = 0, double s3 = 0)
+        : landType(type), OwnerName(name), LandForm(form), side1(s1), side2(s2), side3(s3)
+    {
+
+    }
+
+    std::string getLandType() const { return landType; }
+    std::string getOwnerName() const { return OwnerName; }
+    std::string getLandForm() const { return LandForm; }
+    double getSide1() const { return side1; }
+    double getSide2() const { return side2; }
+    double getSide3() const { return side3; }
+
+    void setLandType(const std::string& type) { landType = type; }
+    void setOwnerName(const std::string& name) { OwnerName = name; }
+    void setLandForm(const std::string& form) { LandForm = form; }
+    void setDimensions(double s1, double s2 = 0, double s3 = 0)
+    {
+        side1 = s1;
+        side2 = s2;
+        side3 = s3;
+    }
+
+    double calculateArea() const
+    {
+        if (LandForm == "Круг")
+            return 3.14 * side1 * side1;
+        else if (LandForm == "Прямоугольник" || LandForm == "Квадрат")
+            return side1 * side2;
+        else if (LandForm == "Треугольник")
+        {
+            double p = (side1 + side2 + side3) / 2;
+            return sqrt(p * (p - side1) * (p - side2) * (p - side3));
+        }
+        return 0;
+    }
+
+    void printInfo() const
+    {
+        std::cout << "Тип участка: " << landType << "\n"
+            << "Владелец: " << OwnerName << "\n"
+            << "Форма: " << LandForm << "\n"
+            << "Площадь: " << calculateArea() << " кв.м\n\n";
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "");
+    LandPlot plot1("ИЖС", "Иванов И.И.", "Прямоугольник", 25.5, 15.0);
+    std::cout << "Участок 1:\n";
+    plot1.printInfo();
+
+    LandPlot plot2("Сельхозназначение", "Петрова А.П.", "Квадрат", 30.0, 30.0);
+    plot2.setOwnerName("Сидорова Анна Петровна");
+    plot2.setDimensions(35.0, 35.0);
+    std::cout << "Участок 2 после изменений:\n";
+    plot2.printInfo();
+
+    LandPlot plot3("ЛПХ", "Кузнецов В.Д.", "Треугольник", 40.0, 25.0, 30.0);
+    std::cout << "Участок 3:\n"
+        << "Владелец: " << plot3.getOwnerName() << "\n"
+        << "Площадь: " << plot3.calculateArea() << " кв.м\n";
+
+    return 0;
+}
