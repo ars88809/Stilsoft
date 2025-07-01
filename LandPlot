@@ -5,76 +5,124 @@
 class LandPlot
 {
 private:
-    std::string landType;
+    std::string LandType;
     std::string OwnerName;
-    std::string LandForm;
-    double side1;
-    double side2;
-    double side3;
 
 public:
-    LandPlot(const std::string& type, const std::string& name, const std::string& form, double s1, double s2 = 0, double s3 = 0)
-        : landType(type), OwnerName(name), LandForm(form), side1(s1), side2(s2), side3(s3)
+    LandPlot(std::string type, std::string owner) : LandType(type), OwnerName(owner)
     {
 
     }
 
-    std::string getLandType() const { return landType; }
-    std::string getOwnerName() const { return OwnerName; }
-    std::string getLandForm() const { return LandForm; }
-    double getSide1() const { return side1; }
-    double getSide2() const { return side2; }
-    double getSide3() const { return side3; }
+    double calculateArea();
 
-    void setLandType(const std::string& type) { landType = type; }
-    void setOwnerName(const std::string& name) { OwnerName = name; }
-    void setLandForm(const std::string& form) { LandForm = form; }
-    void setDimensions(double s1, double s2 = 0, double s3 = 0)
+    void printInfo()
     {
-        side1 = s1;
-        side2 = s2;
-        side3 = s3;
+        std::cout << "Тип участка: " << LandType << "\n" << "Владелец: " << OwnerName << "\n";
+    }
+};
+
+class Circle : public LandPlot
+{
+    double radius;
+
+public:
+    Circle(std::string type, std::string owner, double r) : LandPlot(type, owner), radius(r)
+    {
+
     }
 
-    double calculateArea() const
+    double calculateArea()
     {
-        if (LandForm == "Круг")
-            return 3.14 * side1 * side1;
-        else if (LandForm == "Прямоугольник" || LandForm == "Квадрат")
-            return side1 * side2;
-        else if (LandForm == "Треугольник")
-        {
-            double p = (side1 + side2 + side3) / 2;
-            return sqrt(p * (p - side1) * (p - side2) * (p - side3));
-        }
-        return 0;
+        return 3.14 * radius * radius;
     }
 
-    void printInfo() const
+    void printInfo()
     {
-        std::cout << "Тип участка: " << landType << "\n"
-            << "Владелец: " << OwnerName << "\n"
-            << "Форма: " << LandForm << "\n"
-            << "Площадь: " << calculateArea() << " кв.м\n\n";
+        LandPlot::printInfo();
+        std::cout << "Форма: Круг\n" << "Радиус: " << radius << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+    }
+};
+
+class rectangle : LandPlot
+{
+    double length, width;
+
+public:
+    rectangle(std::string type, std::string owner, double l, double w) : LandPlot(type, owner), length(l), width(w)
+    {
+
+    }
+    
+    double calculateArea()
+    {
+        return length * width;
+    }
+
+    void printInfo()
+    {
+        LandPlot::printInfo();
+        std::cout << "Форма: Прямоугольник\n" << "Размеры: " << length << " м x " << width << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+    }
+};
+
+class square : public LandPlot
+{
+    double s1, s2;
+
+public:
+    square(std::string type, std::string owner, double l, double w) : LandPlot(type, owner), s1(l), s2(w)
+    {
+
+    }
+
+    double calculateArea()
+    {
+        return s1 * s2;
+    }
+
+    void printInfo()
+    {
+        LandPlot::printInfo();
+        std::cout << "Форма: Квадрат\n" << "Размеры: " << s1 << " м x " << s2 << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+    }
+};
+
+class triangle : public LandPlot
+{
+    double s1, s2, s3;
+
+public:
+    triangle(std::string type, std::string owner, double s1, double s2, double s3) : LandPlot(type, owner), s1(s1), s2(s2), s3(s3)
+    {
+
+    }
+
+    double calculateArea()
+    {
+        double p = (s1 + s2 + s3) / 2;
+        return sqrt(p * (p - s1) * (p - s2) * (p - s3));
+    }
+
+    void printInfo()
+    {
+        LandPlot::printInfo();
+        std::cout << "Форма: Треугольник\n" << "Стороны: " << s1 << " м, " << s2 << " м, " << s3 << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
     }
 };
 
 int main() {
     setlocale(LC_ALL, "");
-    LandPlot plot1("ИЖС", "Иванов И.И.", "Прямоугольник", 25.5, 15.0);
-    std::cout << "Участок 1:\n";
-    plot1.printInfo();
+    Circle circlePlot("ИЖС", "Иванов И.И.", 10.0);
+    rectangle rectPlot("Сельхоз", "Петров П.П.", 20.0, 30.0);
+    square squarePlot("ЛПХ", "Сидоров С.С.", 15.0, 15.0);
+    triangle trianglePlot("Дача", "Кузнецов К.К.", 5.0, 5.0, 5.0);
 
-    LandPlot plot2("Сельхозназначение", "Петрова А.П.", "Квадрат", 30.0, 30.0);
-    plot2.setOwnerName("Сидорова Анна Петровна");
-    plot2.setDimensions(35.0, 35.0);
-    std::cout << "Участок 2 после изменений:\n";
-    plot2.printInfo();
-
-    LandPlot plot3("ЛПХ", "Кузнецов В.Д.", "Треугольник", 40.0, 25.0, 30.0);
-    std::cout << "Участок 3:\n"
-        << "Владелец: " << plot3.getOwnerName() << "\n"
-        << "Площадь: " << plot3.calculateArea() << " кв.м\n";
+    std::cout << "Информация об участках:\n\n";
+    circlePlot.printInfo();
+    rectPlot.printInfo();
+    squarePlot.printInfo();
+    trianglePlot.printInfo();
 
     return 0;
 }
