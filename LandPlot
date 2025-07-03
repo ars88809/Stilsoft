@@ -1,128 +1,267 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <vector>
+#include <map>
 
 class LandPlot
 {
 private:
-    std::string LandType;
-    std::string OwnerName;
+    int plotId;
+    std::string geoLocation;
 
 public:
-    LandPlot(std::string type, std::string owner) : LandType(type), OwnerName(owner)
+    LandPlot(int LandId, std::string location) : plotId(LandId), geoLocation(location) 
     {
 
     }
 
-    double calculateArea();
+    virtual double calculateArea() = 0;
 
-    void printInfo()
+    void printBasicInfo()
     {
-        std::cout << "Тип участка: " << LandType << "\n" << "Владелец: " << OwnerName << "\n";
+        std::cout << "ID участка: " << plotId << "\n"
+            << "Географическое положение: " << geoLocation << "\n";
     }
+
+    virtual void printFullInfo() = 0;
+
+    virtual std::string getOwnerName() const = 0;
 };
 
 class Circle : public LandPlot
 {
     double radius;
+    std::string ownerName;
 
 public:
-    Circle(std::string type, std::string owner, double r) : LandPlot(type, owner), radius(r)
+    Circle(int LandId, std::string location, std::string owner, double r) : LandPlot(LandId, location), ownerName(owner), radius(r) 
     {
 
     }
 
-    double calculateArea()
+    double calculateArea() override
     {
         return 3.14 * radius * radius;
     }
 
-    void printInfo()
+    void printFullInfo() override
     {
-        LandPlot::printInfo();
-        std::cout << "Форма: Круг\n" << "Радиус: " << radius << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+        LandPlot::printBasicInfo();
+        std::cout << "Форма: Круг\n"<< "Владелец: " << ownerName << "\n" << "Радиус: " << radius << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
     }
+
+    std::string getOwnerName() const { return ownerName; }
 };
 
-class rectangle : LandPlot
+class Rectangle : public LandPlot
 {
     double length, width;
+    std::string ownerName;
 
 public:
-    rectangle(std::string type, std::string owner, double l, double w) : LandPlot(type, owner), length(l), width(w)
+    Rectangle(int LandId, std::string location, std::string owner, double l, double w) : LandPlot(LandId, location), ownerName(owner), length(l), width(w)
     {
 
     }
-    
-    double calculateArea()
+
+    double calculateArea() override
     {
         return length * width;
     }
 
-    void printInfo()
+    void printFullInfo() override
     {
-        LandPlot::printInfo();
-        std::cout << "Форма: Прямоугольник\n" << "Размеры: " << length << " м x " << width << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+        LandPlot::printBasicInfo();
+        std::cout << "Форма: Прямоугольник\n" << "Владелец: " << ownerName << "\n" << "Размеры: " << length << " м x " << width << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
     }
+
+    std::string getOwnerName() const { return ownerName; }
 };
 
-class square : public LandPlot
+class Square : public LandPlot
 {
-    double s1, s2;
+    double side;
+    std::string ownerName;
 
 public:
-    square(std::string type, std::string owner, double l, double w) : LandPlot(type, owner), s1(l), s2(w)
+    Square(int LandId, std::string location, std::string owner, double s) : LandPlot(LandId, location), ownerName(owner), side(s) 
     {
 
     }
 
-    double calculateArea()
+    double calculateArea() override
     {
-        return s1 * s2;
+        return side * side;
     }
 
-    void printInfo()
+    void printFullInfo() override
     {
-        LandPlot::printInfo();
-        std::cout << "Форма: Квадрат\n" << "Размеры: " << s1 << " м x " << s2 << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+        LandPlot::printBasicInfo();
+        std::cout << "Форма: Квадрат\n" << "Владелец: " << ownerName << "\n" << "Размер: " << side << " м x " << side << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
     }
+
+    std::string getOwnerName() const { return ownerName; }
 };
 
-class triangle : public LandPlot
+class Triangle : public LandPlot
 {
     double s1, s2, s3;
+    std::string ownerName;
 
 public:
-    triangle(std::string type, std::string owner, double s1, double s2, double s3) : LandPlot(type, owner), s1(s1), s2(s2), s3(s3)
+    Triangle(int LandId, std::string location, std::string owner, double s1, double s2, double s3) : LandPlot(LandId, location), ownerName(owner), s1(s1), s2(s2), s3(s3)
     {
 
     }
 
-    double calculateArea()
+    double calculateArea() override
     {
         double p = (s1 + s2 + s3) / 2;
         return sqrt(p * (p - s1) * (p - s2) * (p - s3));
     }
 
+    void printFullInfo() override
+    {
+        LandPlot::printBasicInfo();
+        std::cout << "Форма: Треугольник\n" << "Владелец: " << ownerName << "\n" << "Стороны: " << s1 << " м, " << s2 << " м, " << s3 << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+    }
+
+    std::string getOwnerName() const { return ownerName; }
+};
+
+class Owner
+{
+private:
+    int OwnerId;
+    std::string fullName;
+    std::vector<LandPlot*> ownedPlots;
+
+public:
+    Owner(int OwnerId, std::string name) : OwnerId(OwnerId), fullName(name) 
+    {
+
+    }
+
+    void addPlot(LandPlot* plot)
+    {
+        ownedPlots.push_back(plot);
+    }
+
     void printInfo()
     {
-        LandPlot::printInfo();
-        std::cout << "Форма: Треугольник\n" << "Стороны: " << s1 << " м, " << s2 << " м, " << s3 << " м\n" << "Площадь: " << calculateArea() << " кв.м\n\n";
+        std::cout << "ID владельца: " << OwnerId << "\n";
+        std::cout << "ФИО: " << fullName << "\n";
+        std::cout << "Количество участков: " << ownedPlots.size() << "\n\n";
+    }
+
+    void printAllPlots()
+    {
+        std::cout << "Участки владельца " << fullName << ":\n";
+        for (auto plot : ownedPlots)
+        {
+            plot->printFullInfo();
+        }
+    }
+
+    std::string getFullName() const { return fullName; }
+    int getId() const { return OwnerId; }
+};
+
+class RegPol
+{
+private:
+    std::vector<LandPlot*> landPlots;
+    std::vector<Owner*> owners;
+    std::map<std::string, Owner*> ownerByName;
+
+public:
+    void addLandPlot(LandPlot* plot)
+    {
+        landPlots.push_back(plot);
+    }
+
+    void addOwner(Owner* owner)
+    {
+        owners.push_back(owner);
+        ownerByName[owner->getFullName()] = owner;
+    }
+
+    void registerOwnership()
+    {
+        for (auto plot : landPlots)
+        {
+            std::string ownerName = plot->getOwnerName();
+            if (ownerByName.find(ownerName) != ownerByName.end())
+            {
+                ownerByName[ownerName]->addPlot(plot);
+            }
+        }
+    }
+
+    void printAllLandPlots()
+    {
+        std::cout << "Все земельные участки:\n";
+        for (auto plot : landPlots)
+        {
+            plot->printFullInfo();
+        }
+    }
+
+    void printAllOwners()
+    {
+        std::cout << "Все владельцы:\n";
+        for (auto owner : owners)
+        {
+            owner->printInfo();
+        }
     }
 };
 
 int main() {
     setlocale(LC_ALL, "");
-    Circle circlePlot("ИЖС", "Иванов И.И.", 10.0);
-    rectangle rectPlot("Сельхоз", "Петров П.П.", 20.0, 30.0);
-    square squarePlot("ЛПХ", "Сидоров С.С.", 15.0, 15.0);
-    triangle trianglePlot("Дача", "Кузнецов К.К.", 5.0, 5.0, 5.0);
 
+    Circle* circlePlot = new Circle(1, "55.7558° с.ш., 37.6173° в.д.", "Иванов И.И.", 10.0);
+    Rectangle* rectPlot = new Rectangle(2, "59.9343° с.ш., 30.3351° в.д.", "Петров П.П.", 20.0, 30.0);
+    Square* squarePlot = new Square(3, "56.3287° с.ш., 44.0020° в.д.", "Сидоров С.С.", 15.0);
+    Triangle* trianglePlot = new Triangle(4, "54.7431° с.ш., 55.9678° в.д.", "Кузнецов К.К.", 5.0, 5.0, 5.0);
+    Triangle* trianglePlot_new = new Triangle(4, "54.7431° с.ш., 55.9678° в.д.", "Кузнецов К.К.", 5.0, 5.0, 5.0);
+
+    Owner* owner1 = new Owner(1, "Иванов И.И.");
+    Owner* owner2 = new Owner(2, "Петров П.П.");
+    Owner* owner3 = new Owner(3, "Сидоров С.С.");
+    Owner* owner4 = new Owner(4, "Кузнецов К.К.");
+
+    RegPol registry;
+
+    //Участки в реестр
+    registry.addLandPlot(circlePlot);
+    registry.addLandPlot(rectPlot);
+    registry.addLandPlot(squarePlot);
+    registry.addLandPlot(trianglePlot);
+    registry.addLandPlot(trianglePlot_new);
+
+    //Владельцев в реестр
+    registry.addOwner(owner1);
+    registry.addOwner(owner2);
+    registry.addOwner(owner3);
+    registry.addOwner(owner4);
+
+    //Регистрируем земли владельцев
+    registry.registerOwnership();
+
+    // вывод 
     std::cout << "Информация об участках:\n\n";
-    circlePlot.printInfo();
-    rectPlot.printInfo();
-    squarePlot.printInfo();
-    trianglePlot.printInfo();
+    registry.printAllLandPlots();
+
+    std::cout << "\nИнформация о владельцах:\n";
+    registry.printAllOwners();
+
+    std::cout << "\nИнформация о владениях конкретных владельцев:\n";
+    owner1->printAllPlots();
+    owner2->printAllPlots();
+    owner3->printAllPlots();
+    owner4->printAllPlots();
 
     return 0;
 }
